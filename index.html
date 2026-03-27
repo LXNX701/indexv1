@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOON PROJECT V1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+--bg: #050508; --card: #0c0c18; --border: #1a1a35;
+--cyan: #00e5ff; --cyan-dim: #00b8cc; --green: #00ff88;
+--red: #ff3366; --yellow: #ffaa00; --purple: #b87aff;
+--text: #c0c8e0; --dim: #4a5270; --mono: 'Share Tech Mono', monospace;
+--display: 'Orbitron', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; overflow-x: hidden; }
+
+body::before {
+content: ''; position: fixed; inset: 0;
+background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+pointer-events: none; z-index: 9999;
+}
+
+.grid-bg {
+position: fixed; inset: 0;
+background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+background-size: 40px 40px; pointer-events: none; z-index: 0;
+}
+
+.topline {
+position: fixed; top: 0; left: 0; right: 0; height: 2px;
+background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+z-index: 200; animation: glow 3s ease-in-out infinite;
+}
+@keyframes glow { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+
+nav {
+position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+padding: 16px 32px; border-bottom: 1px solid var(--border); background: rgba(5,5,8,0.92); backdrop-filter: blur(12px);
+}
+.nav-logo { font-family: var(--display); color: var(--cyan); font-size: 13px; letter-spacing: 3px; text-shadow: 0 0 12px var(--cyan); }
+.nav-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s ease-in-out infinite; margin-right: 6px; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+main { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 0 20px 60px; }
+
+.hero { text-align: center; padding: 70px 20px 60px; }
+.hero-sub { font-size: 11px; color: var(--dim); letter-spacing: 4px; margin-bottom: 18px; }
+.hero-title {
+font-family: var(--display); font-size: clamp(28px, 7vw, 68px); font-weight: 900; letter-spacing: 6px;
+background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, #7b2fff 100%);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;
+}
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 26px; position: relative; overflow: hidden; }
+.card-title { font-family: var(--display); color: var(--cyan); font-size: 13px; letter-spacing: 2px; margin-bottom: 22px; }
+
+.key-input { width: 100%; background: #07070f; border: 1px solid var(--border); border-radius: 4px; padding: 13px 16px; color: var(--cyan); font-family: var(--mono); font-size: 13px; outline: none; margin-bottom: 12px; transition: 0.3s; }
+.key-input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0,229,255,0.1); }
+.btn-validate { width: 100%; padding: 13px; background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.4); border-radius: 4px; color: var(--cyan); font-family: var(--display); font-size: 11px; cursor: pointer; letter-spacing: 3px; transition: 0.3s; }
+.btn-validate:hover { background: rgba(0,229,255,0.15); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 40px; }
+@media(max-width:600px){ .two-col{grid-template-columns:1fr;} }
+
+.status-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: #08080f; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
+.badge { color: var(--green); background: rgba(0,255,136,0.07); border: 1px solid rgba(0,255,136,0.2); padding: 3px 10px; border-radius: 3px; font-size: 10px; }
+
+.metric-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); margin-bottom: 5px; }
+.metric-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 15px; }
+.metric-fill { height: 100%; background: linear-gradient(90deg, transparent, var(--cyan)); transition: width 1s ease; }
+
+.terminal { background: #06060e; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-top: 40px; font-size: 11px; max-height: 200px; overflow-y: auto; }
+.log-line { display: flex; gap: 10px; margin-bottom: 5px; }
+.log-time { color: var(--dim); }
+.log-lvl-ok { color: var(--green); }
+.log-lvl-warn { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="topline"></div>
+
+<nav>
+  <div class="nav-logo">MOON/SYS</div>
+  <div style="font-size:11px;color:var(--dim);"><span class="nav-dot"></span>SYSTEM_ACTIVE</div>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="hero-sub">TERMINAL DE ACCESO AUTORIZADO</div>
+    <h1 class="hero-title">MOON PROJECT V1</h1>
+    <div style="margin-top:22px; padding:7px 20px; border:1px solid rgba(0,255,136,0.3); border-radius:4px; display:inline-block; color:var(--green); font-size:12px;">CANAL CIFRADO ACTIVO</div>
+  </section>
+
+  <div style="max-width:500px; margin: 0 auto;">
+    <div class="card">
+      <div class="card-title">VALIDACION DE LICENCIA</div>
+      <input class="key-input" id="keyInput" type="password" placeholder="Introduce tu llave secreta..." autocomplete="off">
+      <button class="btn-validate" id="validateBtn" onclick="validateKey()">VALIDAR ACCESO</button>
+      <div id="validateMsg" style="text-align: center; font-size: 12px; margin-top: 15px; min-height: 18px;"></div>
+    </div>
+  </div>
+
+  <section class="two-col">
+    <div class="card">
+      <div class="card-title">ESTADO DE NODOS</div>
+      <div class="status-item"><span>Inyector</span><span class="badge">ACTIVO</span></div>
+      <div class="status-item"><span>Database</span><span class="badge">ONLINE</span></div>
+      <div class="status-item"><span>Auth Relay</span><span class="badge">READY</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">SISTEMA</div>
+      <div class="metric-header"><span>CARGA CPU</span><span id="cpuVal">24%</span></div>
+      <div class="metric-bar"><div class="metric-fill" id="cpuBar" style="width:24%"></div></div>
+      <div class="metric-header"><span>MEMORIA</span><span>1.4 / 8 GB</span></div>
+      <div class="metric-bar"><div class="metric-fill" style="width:17%; background:var(--green)"></div></div>
+    </div>
+  </section>
+
+  <div class="terminal">
+    <div style="color:var(--dim); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">MOON_SYS :: RUNTIME_LOGS</div>
+    <div id="logContainer">
+      <div class="log-line"><span class="log-time">08:14:22</span><span class="log-lvl-ok">[OK]</span> Sistema inicializado con éxito</div>
+    </div>
+  </div>
+</main>
+
+<script>
+// USANDO TUS CREDENCIALES REALES
+const SB_URL = "https://ivkikynruyhazugzasyg.supabase.co"; 
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2a2lreW5ydXloYXp1Z3phc3lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Nzg5MDgsImV4cCI6MjA5MDE1NDkwOH0.9xcBUZX0GX2uLA3-IXjmAWFQv5luR0z-Ui4o2PIfRFs";
+
+// Simulación de métricas animadas
+setInterval(() => {
+  const cpu = 20 + Math.floor(Math.random() * 20);
+  document.getElementById('cpuVal').textContent = cpu + '%';
+  document.getElementById('cpuBar').style.width = cpu + '%';
+}, 3000);
+
+async function getHWID(){
+  // Genera un ID único basado en el navegador del usuario
+  const raw = navigator.userAgent + screen.width + navigator.language;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').substring(0,16);
+}
+
+async function validateKey(){
+  const key = document.getElementById('keyInput').value.trim();
+  const msg = document.getElementById('validateMsg');
+  const btn = document.getElementById('validateBtn');
+  
+  if(!key) { 
+    msg.style.color = 'var(--red)'; 
+    msg.textContent = 'ERROR: LLAVE REQUERIDA'; 
+    addLog('WARN', 'Intento de acceso sin llave');
+    return; 
+  }
+  
+  btn.textContent = 'CIFRANDO...';
+  btn.disabled = true;
+  const hwid = await getHWID();
+  
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/rpc/validate_key`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'apikey': SB_KEY, 
+        'Authorization': `Bearer ${SB_KEY}` 
+      },
+      body: JSON.stringify({ p_key: key, p_hwid: hwid })
+    });
+
+    const result = await res.json();
+    btn.disabled = false;
+    btn.textContent = 'VALIDAR ACCESO';
+
+    if (result === 'ok') {
+      msg.style.color = 'var(--green)';
+      msg.textContent = 'ACCESO CONCEDIDO';
+      addLog('OK', 'Licencia validada: ' + key.substring(0,8) + '...');
+      // OPCIONAL: Redirigir a tu descarga o script
+      // window.location.href = "LINK_DE_TU_MOD";
+    } else {
+      msg.style.color = 'var(--red)';
+      msg.textContent = result.replace('_', ' ');
+      addLog('WARN', 'Fallo de Auth: ' + result);
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'VALIDAR ACCESO';
+    msg.style.color = 'var(--red)';
+    msg.textContent = 'ERROR DE CONEXIÓN';
+    addLog('WARN', 'Error de red con Supabase');
+  }
+}
+
+function addLog(lvl, m){
+  const t = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  const lvlClass = lvl === 'OK' ? 'log-lvl-ok' : 'log-lvl-warn';
+  line.innerHTML = `<span class="log-time">${t}</span><span class="${lvlClass}">[${lvl}]</span> ${m}`;
+  const container = document.getElementById('logContainer');
+  container.appendChild(line);
+  document.querySelector('.terminal').scrollTop = container.scrollHeight;
+}
+</script>
+</body>
+</html>
